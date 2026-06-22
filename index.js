@@ -11,7 +11,7 @@ app.use(express.json())
 const PORT = process.env.PORT;
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = process.env.MONGODB_URI;
 
 const client = new MongoClient(uri, {
@@ -34,6 +34,12 @@ async function run() {
         console.log('work')
         const result = await facilities.insertOne(facility);
         res.json({status: 200, message: 'Facility added successfully.'})
+    })
+
+    app.get('/my-facilities/:email', async (req, res) => {
+        const email = req.params.email;
+        const result = await facilities.find({owner_email: email}).toArray();
+        res.json({status: 200, message: 'Success', data: result})
     })
 
 
