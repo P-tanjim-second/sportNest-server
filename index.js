@@ -31,7 +31,6 @@ async function run() {
 
     app.post('/add_facility', async (req, res) => {
         const facility = req.body;
-        console.log('work')
         const result = await facilities.insertOne(facility);
         res.json({status: 200, message: 'Facility added successfully.'})
     })
@@ -49,7 +48,20 @@ async function run() {
     })
 
 
-
+    app.patch('/my_facility/edit/:id', async (req, res) => {
+        const id = req.params.id;
+        const updatedData = req.body;
+        const result = await facilities.updateOne(
+            {_id: new ObjectId(id)},
+            {$set: updatedData}
+        )
+        if (result.modifiedCount === 1) {
+            res.json({status: 200, message: 'Facility updated successfully.'})
+        }
+        else{
+            res.json({status: 400, message: 'Facility not updated.'})
+        }
+    })
 
 
 
