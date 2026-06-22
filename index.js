@@ -55,17 +55,18 @@ async function run() {
             {_id: new ObjectId(id)},
             {$set: updatedData}
         )
-        if (result.modifiedCount === 1) {
-            res.json({status: 200, message: 'Facility updated successfully.'})
-        }
-        else{
-            res.json({status: 400, message: 'Facility not updated.'})
-        }
+        res.json({status: 200, message: 'Facility updated successfully.'})
     })
 
 
     app.get('/all_facilities', async (req, res) => {
         const result = await facilities.find().toArray();
+        res.json({status: 200, data: result})
+    })
+
+    app.get('/facility/:id', async (req, res) => {
+        const id = req.params.id;
+        const result = await facilities.findOne({_id: new ObjectId(id)});
         res.json({status: 200, data: result})
     })
 
