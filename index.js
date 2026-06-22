@@ -27,7 +27,18 @@ async function run() {
     await client.connect();
 
     const db = client.db('sportNest');
-    const users = db.collection('users')
+    const facilities = db.collection('facilities');
+
+    app.post('/add_facility', async (req, res) => {
+        const facility = req.body;
+        console.log('work')
+        const result = await facilities.insertOne(facility);
+        res.json({status: 200, message: 'Facility added successfully.'})
+    })
+
+
+
+
 
 
 
