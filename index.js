@@ -42,6 +42,12 @@ async function run() {
         res.json({status: 200, message: 'Success', data: result})
     })
 
+    app.delete('/my_facility/delete/:id', async (req, res) => {
+        const id = req.params.id;
+        const result = await facilities.deleteOne({_id: new ObjectId(id)})
+        res.json({status: 200, message: 'Facility deleted successfully.'})
+    })
+
 
 
 
