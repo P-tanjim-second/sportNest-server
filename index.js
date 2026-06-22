@@ -64,6 +64,11 @@ async function run() {
     })
 
 
+    app.get('/all_facilities', async (req, res) => {
+        const result = await facilities.find().toArray();
+        res.json({status: 200, data: result})
+    })
+
 
 
     // await client.db("admin").command({ ping: 1 });
