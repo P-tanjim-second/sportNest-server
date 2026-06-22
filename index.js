@@ -28,6 +28,7 @@ async function run() {
 
     const db = client.db('sportNest');
     const facilities = db.collection('facilities');
+    const bookings = db.collection('bookings');
 
     app.post('/add_facility', async (req, res) => {
         const facility = req.body;
@@ -69,6 +70,14 @@ async function run() {
         const result = await facilities.findOne({_id: new ObjectId(id)});
         res.json({status: 200, data: result})
     })
+
+
+    app.post('/booking', async(req, res) => {
+        const data = req.body;
+        const result = await bookings.insertOne(data);
+        res.json({status: 200, message: "Booking Successfull"})
+    })
+
 
 
 
