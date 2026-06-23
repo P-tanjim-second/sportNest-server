@@ -60,18 +60,24 @@ async function run() {
     });
 
     
-    app.patch('/facility/inc_booking/:id', async (req, res) => {
+    app.patch('/facility/inc_dec_booking/:id/:value', async (req, res) => {
       const id = req.params.id;
+      const value = req.params.value;
       const result = await facilities.updateOne(
         {_id: new ObjectId(id)},
-        {$inc: {booking_count: 1}}
+        {$inc: {booking_count: value}}
       );
       res.json({status: 200, message: 'booking updated'})
     })
 
 
     app.get('/all_facilities', async (req, res) => {
-        const result = await facilities.find().toArray();
+      const {type} = req.query;  
+      const query = {}
+      if (type) {
+        query.facility_type = type;
+      }
+        const result = await facilities.find(query).toArray();
         res.json({status: 200, data: result})
     })
 
