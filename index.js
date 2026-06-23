@@ -62,7 +62,8 @@ async function run() {
 
     app.patch('/facility/inc_dec_booking/:id/:value', async (req, res) => {
       const id = req.params.id;
-      const value = req.params.value;
+      const value = parseInt(req.params.value);
+
       const result = await facilities.updateOne(
         { _id: new ObjectId(id) },
         { $inc: { booking_count: value } }
