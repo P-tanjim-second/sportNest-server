@@ -79,7 +79,11 @@ async function run() {
     })
 
 
-
+    app.get('/booking/:email', async (req, res) => {
+      const email = req.params.email;
+      const result = await bookings.find({user_email: email}).toArray();
+      res.json({status: 200, data: result});
+    })
 
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
