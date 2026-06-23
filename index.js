@@ -95,6 +95,13 @@ async function run() {
       res.json({status: 200, data: result});
     })
 
+
+    app.delete('/booking/cancel/:id', async (req, res) => {
+      const id = req.params.id;
+      const result = await bookings.deleteOne({facility_id: id})
+      res.json({status: 200, data: result})
+    })
+
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
