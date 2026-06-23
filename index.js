@@ -113,6 +113,13 @@ async function run() {
       res.json({status: 200, data: result});
     })
 
+
+  app.get('/limit_facilities', async (req, res) => {
+    const result = await facilities.find().limit(6).toArray();
+    res.json({status: 200, data: result})
+  })
+
+
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
