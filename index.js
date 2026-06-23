@@ -57,6 +57,16 @@ async function run() {
             {$set: updatedData}
         )
         res.json({status: 200, message: 'Facility updated successfully.'})
+    });
+
+    
+    app.patch('/facility/inc_booking/:id', async (req, res) => {
+      const id = req.params.id;
+      const result = await facilities.updateOne(
+        {_id: new ObjectId(id)},
+        {$inc: {booking_count: 1}}
+      );
+      res.json({status: 200, message: 'booking updated'})
     })
 
 
