@@ -12,6 +12,7 @@ const PORT = process.env.PORT;
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { createRemoteJWKSet, jwtVerify } = require('jose-cjs');
 const uri = process.env.MONGODB_URI;
 
 const client = new MongoClient(uri, {
@@ -22,6 +23,28 @@ const client = new MongoClient(uri, {
   }
 });
 
+const JWKS = createRemoteJWKSet(new URL(`${process.env.CLIENT_URL}/api/auth/jwks`));
+
+const verifyToken = async (req, res, next) => {
+  const authHeader = req?.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "Unauthorized!"})
+  }
+  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({message: "Unauthorized!"});
+  }
+
+  try{
+    const { payload} = await jwtVerify(token, JWKS);
+    next();
+  }
+  catch(error){
+    return res.status(403).json({message: error})
+  }
+}
+
+
 async function run() {
   try {
     // await client.connect();
@@ -30,26 +53,26 @@ async function run() {
     const facilities = db.collection('facilities');
     const bookings = db.collection('bookings');
 
-    app.post('/add_facility', async (req, res) => {
+    app.post('/add_facility', verifyToken, async (req, res) => {
       const facility = req.body;
       const result = await facilities.insertOne(facility);
       res.json({ status: 200, message: 'Facility added successfully.' })
     })
 
-    app.get('/my-facilities/:email', async (req, res) => {
+    app.get('/my-facilities/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
       const result = await facilities.find({ owner_email: email }).toArray();
       res.json({ status: 200, message: 'Success', data: result })
     })
 
-    app.delete('/my_facility/delete/:id', async (req, res) => {
+    app.delete('/my_facility/delete/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
       const result = await facilities.deleteOne({ _id: new ObjectId(id) })
       res.json({ status: 200, message: 'Facility deleted successfully.' })
     })
 
 
-    app.patch('/my_facility/edit/:id', async (req, res) => {
+    app.patch('/my_facility/edit/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
       const updatedData = req.body;
       const result = await facilities.updateOne(
@@ -60,7 +83,7 @@ async function run() {
     });
 
 
-    app.patch('/facility/inc_dec_booking/:id/:value', async (req, res) => {
+    app.patch('/facility/inc_dec_booking/:id/:value', verifyToken, async (req, res) => {
       const id = req.params.id;
       const value = parseInt(req.params.value);
 
@@ -88,35 +111,35 @@ async function run() {
       res.json({ status: 200, data: result })
     })
 
-    app.get('/facility/:id', async (req, res) => {
+    app.get('/facility/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
       const result = await facilities.findOne({ _id: new ObjectId(id) });
       res.json({ status: 200, data: result })
     })
 
 
-    app.post('/booking', async (req, res) => {
+    app.post('/booking', verifyToken, async (req, res) => {
       const data = req.body;
       const result = await bookings.insertOne(data);
       res.json({ status: 200, message: "Booking Successfull" })
     })
 
 
-    app.get('/booking/:email', async (req, res) => {
+    app.get('/booking/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
       const result = await bookings.find({ user_email: email }).toArray();
       res.json({ status: 200, data: result });
     })
 
 
-    app.delete('/booking/cancel/:id', async (req, res) => {
+    app.delete('/booking/cancel/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
       const result = await bookings.deleteOne({ facility_id: id })
       res.json({ status: 200, data: result })
     })
 
 
-    app.get('/facility/:email/:id', async (req, res) => {
+    app.get('/facility/:email/:id', verifyToken, async (req, res) => {
       const email = req.params.email;
       const id = req.params.id;
       const result = await bookings.find({
